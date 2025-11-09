@@ -19,12 +19,18 @@ def calculate_profit(*args):
 
         # === Calculation ===
         price_spread = S_open - S_close
-        n_low = hold_hours / low_hours
-        n_high = hold_hours / high_hours
-        funding_diff = high_rate * n_high - low_rate * n_low
+
+        # 计算结算次数（只取完整结算次数）
+        n_low = int(hold_hours // low_hours)
+        n_high = int(hold_hours // high_hours)
+
+        # ✅ 修正资金费率逻辑：负号代表多头收取（收益）
+        funding_diff = (-low_rate) * n_low + (high_rate) * n_high
+
         total_fee = 2 * (fee_low + fee_high)
         net_percent = price_spread + funding_diff - total_fee - slippage
         profit_usdt = V * net_percent / 100
+
 
         label_result.config(
             text=(
